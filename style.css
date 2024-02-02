@@ -12,13 +12,25 @@ html, body{
   padding: 20px;
   font-size: 25px;
 }
-
-.carta{
+.carta {
   position: relative;
   width: 150px;
   left: 100px;
-  margin-left: -75px ;
+  margin-left: -75px;
+  animation: Carta 0.5s ease-in-out;
 }
+
+@keyframes Carta {
+  from {
+    opacity: 0;
+    transform: translateX(400px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 
 #computadora-cartas, #jugador-cartas {
   height: 240px;
