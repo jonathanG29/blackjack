@@ -2,7 +2,8 @@ import {
   crearDeck,
   pedirCarta,
   calcularPuntos,
-  turnoComputadora,
+  jugarComputadora,
+  determinarGanador,
   crearCartaHTML,
 } from "./usecases";
 
@@ -29,18 +30,24 @@ const divResultado = document.querySelector("#resultado");
 const DURACION_ANIMACION = 500;
 let timeoutResultado;
 
+const RESULTADOS = {
+  jugador: { mensaje: "Jugador gana", tipo: "alert-success" },
+  computadora: { mensaje: "Computadora gana", tipo: "alert-danger" },
+  empate: { mensaje: "Nadie gana :(", tipo: "alert-secondary" },
+};
+
 deck = crearDeck(tipos, especiales);
 
 const terminarTurnoJugador = () => {
   btnPedir.disabled = true;
   btnDetener.disabled = true;
 
-  const { mensaje, tipo } = turnoComputadora(
-    puntosJugador,
-    puntosComputadoraHTML,
-    divCartasComputadora,
-    deck
-  );
+  const { mano, puntos } = jugarComputadora(puntosJugador, deck);
+
+  mano.forEach((carta) => divCartasComputadora.append(crearCartaHTML(carta)));
+  puntosComputadoraHTML.innerText = puntos;
+
+  const { mensaje, tipo } = RESULTADOS[determinarGanador(puntosJugador, puntos)];
 
   // Esperamos a que termine la animación de la última carta
   timeoutResultado = setTimeout(() => {
