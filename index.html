@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Blackjack - Vite</title>
+    <title>Blackjack</title>
 
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
@@ -20,11 +20,21 @@
         <div class="row mt-2">
             <div id="divBotones" class="col text-center">
 
-                <button id="btnNuevo" class="btn btn-danger">Nuevo Juego</button>
-                <button id="btnPedir" class="btn btn-primary">Pedir carta</button>
-                <button id="btnDetener" class="btn btn-primary" disabled>Detener</button>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <button id="btnNuevo" class="btn btn-danger">Nuevo Juego</button>
+                    <button id="btnPedir" class="btn btn-primary">Pedir carta</button>
+                    <button id="btnDetener" class="btn btn-primary" disabled>Detener</button>
+                </div>
 
-                <div id="resultado" class="alert fw-bold mx-auto mt-3" style="max-width: 400px;" hidden></div>
+                <p id="marcador" class="marcador mt-3 mb-0">
+                    Ganadas: <strong id="ganadas">0</strong> ·
+                    Perdidas: <strong id="perdidas">0</strong> ·
+                    Empates: <strong id="empates">0</strong>
+                </p>
+                <button id="btnCambiarNombre" class="btn btn-link btn-sm text-white">Cambiar nombre</button>
+                <button id="btnReiniciarMarcador" class="btn btn-link btn-sm text-white">Reiniciar marcador</button>
+
+                <div id="resultado" class="alert fw-bold mx-auto mt-3" style="max-width: 400px;" role="status" hidden></div>
 
             </div>
         </div>

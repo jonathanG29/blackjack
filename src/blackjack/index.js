@@ -4,8 +4,10 @@ import {
   calcularPuntos,
   jugarComputadora,
   determinarGanador,
+  esBlackjack,
   crearCartaHTML,
 } from "./usecases";
+import { leer, guardar } from "./almacenamiento";
 
 let deck = [];
 const tipos = ["C", "D", "H", "S"];
@@ -15,6 +17,14 @@ let puntosJugador = 0;
 let manoJugador = [];
 let manoComputadora = [];
 let nombreJugador = "Jugador 1";
+
+// Partidas ganadas, perdidas y empatadas, por ganador
+let marcador = {
+  jugador: 0,
+  computadora: 0,
+  empate: 0,
+  ...leer("blackjack-marcador", {}),
+};
 
 // Referencias del HTML
 const btnPedir = document.querySelector("#btnPedir");
@@ -33,6 +43,14 @@ const formNombre = document.querySelector("#form-nombre");
 const inputNombre = document.querySelector("#input-nombre");
 const nombreJugadorHTML = document.querySelector("#nombre-jugador");
 
+const btnCambiarNombre = document.querySelector("#btnCambiarNombre");
+const btnReiniciarMarcador = document.querySelector("#btnReiniciarMarcador");
+const marcadorHTML = {
+  jugador: document.querySelector("#ganadas"),
+  computadora: document.querySelector("#perdidas"),
+  empate: document.querySelector("#empates"),
+};
+
 // Carta de la computadora boca abajo hasta que el jugador se planta
 let cartaOcultaHTML;
 
@@ -44,12 +62,21 @@ let partida = 0;
 
 const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const crearResultado = (ganador) =>
-  ({
-    jugador: { mensaje: `${nombreJugador} gana`, tipo: "alert-success" },
-    computadora: { mensaje: "Computadora gana", tipo: "alert-danger" },
+const crearResultado = (ganador, manoGanadora) => {
+  const blackjack = esBlackjack(manoGanadora) ? "¡Blackjack! " : "";
+
+  return {
+    jugador: { mensaje: `${blackjack}${nombreJugador} gana`, tipo: "alert-success" },
+    computadora: { mensaje: `${blackjack}Computadora gana`, tipo: "alert-danger" },
     empate: { mensaje: "Nadie gana :(", tipo: "alert-secondary" },
-  })[ganador];
+  }[ganador];
+};
+
+const pintarMarcador = () => {
+  for (const ganador in marcadorHTML) {
+    marcadorHTML[ganador].innerText = marcador[ganador];
+  }
+};
 
 const darCartaJugador = () => {
   const carta = pedirCarta(deck);
@@ -82,7 +109,7 @@ const terminarTurnoJugador = async () => {
   btnDetener.disabled = true;
 
   const partidaActual = partida;
-  const { mano, puntos } = jugarComputadora(puntosJugador, deck, manoComputadora);
+  const { mano } = jugarComputadora(puntosJugador, deck, manoComputadora);
 
   // Volteamos la carta oculta
   const cartaVolteada = crearCartaHTML(manoComputadora[1]);
@@ -103,10 +130,16 @@ const terminarTurnoJugador = async () => {
   if (partidaActual !== partida) return;
   manoComputadora = mano;
 
-  const { mensaje, tipo } = crearResultado(determinarGanador(puntosJugador, puntos));
+  const ganador = determinarGanador(manoJugador, manoComputadora);
+  const manoGanadora = ganador === "jugador" ? manoJugador : manoComputadora;
+  const { mensaje, tipo } = crearResultado(ganador, manoGanadora);
   divResultado.innerText = mensaje;
   divResultado.classList.add(tipo);
   divResultado.hidden = false;
+
+  marcador[ganador]++;
+  guardar("blackjack-marcador", marcador);
+  pintarMarcador();
 };
 
 const iniciarJuego = async () => {
@@ -156,11 +189,16 @@ const iniciarJuego = async () => {
   }
 };
 
-// Pedimos el nombre antes de empezar
+pintarMarcador();
+
+// Pedimos el nombre antes de empezar, con el último que se usó ya escrito
+inputNombre.value = leer("blackjack-nombre", "");
 modalNombre.showModal();
 
-// Sin nombre no se puede cerrar el modal con Escape
-modalNombre.addEventListener("cancel", (event) => event.preventDefault());
+// Antes de la primera partida no se puede cerrar el modal con Escape
+modalNombre.addEventListener("cancel", (event) => {
+  if (partida === 0) event.preventDefault();
+});
 
 inputNombre.addEventListener("input", () => {
   // required acepta un nombre de solo espacios, así que lo validamos aparte
@@ -172,7 +210,10 @@ inputNombre.addEventListener("input", () => {
 formNombre.addEventListener("submit", () => {
   nombreJugador = inputNombre.value.trim();
   nombreJugadorHTML.innerText = nombreJugador;
-  iniciarJuego();
+  guardar("blackjack-nombre", nombreJugador);
+
+  // Al cambiar el nombre a mitad de partida no se reinicia el juego
+  if (partida === 0) iniciarJuego();
 });
 
 // Eventos
@@ -187,3 +228,14 @@ btnPedir.addEventListener("click", () => {
 btnDetener.addEventListener("click", terminarTurnoJugador);
 
 btnNuevo.addEventListener("click", iniciarJuego);
+
+btnCambiarNombre.addEventListener("click", () => {
+  inputNombre.value = nombreJugador;
+  modalNombre.showModal();
+});
+
+btnReiniciarMarcador.addEventListener("click", () => {
+  marcador = { jugador: 0, computadora: 0, empate: 0 };
+  guardar("blackjack-marcador", marcador);
+  pintarMarcador();
+});
