@@ -66,6 +66,9 @@ btnPedir.addEventListener("click", () => {
 
   if (puntosJugador >= 21) {
     terminarTurnoJugador();
+  } else {
+    // Solo se puede detener después de pedir al menos una carta
+    btnDetener.disabled = false;
   }
 });
 
@@ -91,5 +94,5 @@ btnNuevo.addEventListener("click", () => {
   divResultado.classList.remove("alert-success", "alert-danger", "alert-secondary");
 
   btnPedir.disabled = false;
-  btnDetener.disabled = false;
+  btnDetener.disabled = true;
 });
