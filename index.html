@@ -32,7 +32,7 @@
         <div class="row">
             <div class="col">
 
-                <h1>Jugador 1 - <small id="puntos-jugador">0</small></h1>
+                <h1><span id="nombre-jugador">Jugador 1</span> - <small id="puntos-jugador">0</small></h1>
                 <div id="jugador-cartas">
                     <!-- <img class="carta" src="assets/cartas/2C.png"> -->
                 </div>
@@ -52,6 +52,14 @@
         </div>
 
     </main>
+
+    <dialog id="modal-nombre" class="modal-nombre">
+        <form id="form-nombre" method="dialog">
+            <label for="input-nombre" class="form-label fw-bold">¿Cómo te llamas?</label>
+            <input id="input-nombre" class="form-control" type="text" maxlength="20" placeholder="Tu nombre" autocomplete="off" required autofocus>
+            <button class="btn btn-primary w-100 mt-3">Empezar</button>
+        </form>
+    </dialog>
 
     <script type="module" src="/main.js"></script>
   </body>

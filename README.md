@@ -4,8 +4,11 @@ Juego de Blackjack contra la computadora hecho con JavaScript vanilla, [Vite](ht
 
 ## Cómo jugar
 
+Al empezar escribes tu nombre y se reparten 2 cartas a cada uno. Una de las cartas de la computadora queda boca abajo hasta que te plantas.
+Si sacas 21 con las dos primeras cartas (blackjack), tu turno termina solo.
+
 - **Pedir carta:** saca una carta. Si llegas a 21 o te pasas, el turno termina solo.
-- **Detener:** te plantas y juega la computadora (debes pedir al menos una carta antes).
+- **Detener:** te plantas, se voltea la carta oculta y juega la computadora.
 - **Nuevo juego:** reinicia la partida con un mazo nuevo.
 
 Las cartas numéricas valen su número, J, Q y K valen 10, y el As vale 11 o 1 según convenga.

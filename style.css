@@ -32,6 +32,17 @@ html, body{
 }
 
 
+.modal-nombre {
+  width: min(90%, 320px);
+  padding: 24px;
+  border: none;
+  border-radius: 12px;
+}
+
+.modal-nombre::backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
 #computadora-cartas, #jugador-cartas {
   height: 240px;
 }
