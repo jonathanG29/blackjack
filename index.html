@@ -15,39 +15,43 @@
         Blackjack
     </header>
     
-    <div class="row mt-2">
-        <div id="divBotones" class="col text-center">
+    <main class="container">
 
-            <button id="btnNuevo" class="btn btn-danger">Nuevo Juego</button>
-            <button id="btnPedir" class="btn btn-primary">Pedir carta</button>
-            <button id="btnDetener" class="btn btn-primary" disabled>Detener</button>
+        <div class="row mt-2">
+            <div id="divBotones" class="col text-center">
 
-            <div id="resultado" class="alert fw-bold mx-auto mt-3" style="max-width: 400px;" hidden></div>
+                <button id="btnNuevo" class="btn btn-danger">Nuevo Juego</button>
+                <button id="btnPedir" class="btn btn-primary">Pedir carta</button>
+                <button id="btnDetener" class="btn btn-primary" disabled>Detener</button>
 
-        </div>
-    </div>
+                <div id="resultado" class="alert fw-bold mx-auto mt-3" style="max-width: 400px;" hidden></div>
 
-    <div class="row container">
-        <div class="col">
-
-            <h1>Jugador 1 - <small id="puntos-jugador">0</small></h1>
-            <div id="jugador-cartas">
-                <!-- <img class="carta" src="assets/cartas/2C.png"> -->
             </div>
-
         </div>
-    </div>
 
-    <div class="row container mt-2">
-        <div class="col">
+        <div class="row">
+            <div class="col">
 
-            <h1>Computadora - <small id="puntos-computadora">0</small></h1>
-            <div id="computadora-cartas">
-                <!-- <img class="carta" src="assets/cartas/3C.png"> -->
+                <h1>Jugador 1 - <small id="puntos-jugador">0</small></h1>
+                <div id="jugador-cartas">
+                    <!-- <img class="carta" src="assets/cartas/2C.png"> -->
+                </div>
+
             </div>
-
         </div>
-    </div>
+
+        <div class="row mt-2">
+            <div class="col">
+
+                <h1>Computadora - <small id="puntos-computadora">0</small></h1>
+                <div id="computadora-cartas">
+                    <!-- <img class="carta" src="assets/cartas/3C.png"> -->
+                </div>
+
+            </div>
+        </div>
+
+    </main>
 
     <script type="module" src="/main.js"></script>
   </body>
