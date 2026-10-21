@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import {
+    calcularPago,
     calcularPuntos,
     crearDeck,
     determinarGanador,
@@ -7,6 +8,7 @@ import {
     jugarComputadora,
     nombreCarta,
     pedirCarta,
+    puedeDoblar,
     valorCarta,
 } from './';
 
@@ -174,5 +176,42 @@ describe('determinarGanador', () => {
 
     test('si los dos tienen blackjack hay empate', () => {
         expect( determinarGanador(['AS', 'KD'], ['AH', 'QC']) ).toBe('empate');
+    });
+});
+
+describe('calcularPago', () => {
+    test('una victoria paga 1:1', () => {
+        expect( calcularPago('jugador', 100) ).toBe(200);
+    });
+
+    test('un blackjack paga 3:2', () => {
+        expect( calcularPago('jugador', 100, true) ).toBe(250);
+    });
+
+    test('el 3:2 redondea hacia abajo las medias fichas', () => {
+        expect( calcularPago('jugador', 25, true) ).toBe(62);
+    });
+
+    test('un empate devuelve la apuesta', () => {
+        expect( calcularPago('empate', 100) ).toBe(100);
+    });
+
+    test('si gana la computadora se pierde la apuesta', () => {
+        expect( calcularPago('computadora', 100) ).toBe(0);
+        expect( calcularPago('computadora', 100, true) ).toBe(0);
+    });
+});
+
+describe('puedeDoblar', () => {
+    test('se puede doblar con dos cartas y saldo suficiente', () => {
+        expect( puedeDoblar(['5C', '6D'], 100, 100) ).toBe(true);
+    });
+
+    test('no se puede doblar sin saldo suficiente', () => {
+        expect( puedeDoblar(['5C', '6D'], 50, 100) ).toBe(false);
+    });
+
+    test('no se puede doblar después de pedir carta', () => {
+        expect( puedeDoblar(['5C', '6D', '2H'], 500, 100) ).toBe(false);
     });
 });
