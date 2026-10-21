@@ -20,6 +20,19 @@ html, body{
   animation: Carta 0.5s ease-in-out;
 }
 
+.carta.volteada {
+  animation: Voltear 0.5s ease-in-out;
+}
+
+@keyframes Voltear {
+  from {
+    transform: rotateY(90deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
+}
+
 @keyframes Carta {
   from {
     opacity: 0;

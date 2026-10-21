@@ -36,9 +36,13 @@ const nombreJugadorHTML = document.querySelector("#nombre-jugador");
 // Carta de la computadora boca abajo hasta que el jugador se planta
 let cartaOcultaHTML;
 
-// Debe coincidir con la duración de la animación .carta en style.css
+// Debe coincidir con la duración de las animaciones .carta en style.css
 const DURACION_ANIMACION = 500;
-let timeoutResultado;
+
+// Cambia en cada partida para cortar la animación si se empieza un nuevo juego
+let partida = 0;
+
+const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const crearResultado = (ganador) =>
   ({
@@ -58,33 +62,40 @@ const darCartaJugador = () => {
   divCartasJugador.append(crearCartaHTML(carta));
 };
 
-const terminarTurnoJugador = () => {
+const terminarTurnoJugador = async () => {
   btnPedir.disabled = true;
   btnDetener.disabled = true;
 
-  // Volteamos la carta oculta
-  cartaOcultaHTML.replaceWith(crearCartaHTML(manoComputadora[1]));
-
+  const partidaActual = partida;
   const { mano, puntos } = jugarComputadora(puntosJugador, deck, manoComputadora);
 
-  // Solo pintamos las cartas nuevas, las dos primeras ya están en la mesa
-  mano
-    .slice(manoComputadora.length)
-    .forEach((carta) => divCartasComputadora.append(crearCartaHTML(carta)));
+  // Volteamos la carta oculta
+  const cartaVolteada = crearCartaHTML(manoComputadora[1]);
+  cartaVolteada.classList.add("volteada");
+  cartaOcultaHTML.replaceWith(cartaVolteada);
+  puntosComputadoraHTML.innerText = calcularPuntos(manoComputadora);
+  await esperar(DURACION_ANIMACION);
+
+  // La computadora saca sus cartas nuevas una por una
+  for (let i = manoComputadora.length; i < mano.length; i++) {
+    if (partidaActual !== partida) return;
+
+    divCartasComputadora.append(crearCartaHTML(mano[i]));
+    puntosComputadoraHTML.innerText = calcularPuntos(mano.slice(0, i + 1));
+    await esperar(DURACION_ANIMACION);
+  }
+
+  if (partidaActual !== partida) return;
   manoComputadora = mano;
-  puntosComputadoraHTML.innerText = puntos;
 
   const { mensaje, tipo } = crearResultado(determinarGanador(puntosJugador, puntos));
-
-  // Esperamos a que termine la animación de la última carta
-  timeoutResultado = setTimeout(() => {
-    divResultado.innerText = mensaje;
-    divResultado.classList.add(tipo);
-    divResultado.hidden = false;
-  }, DURACION_ANIMACION);
+  divResultado.innerText = mensaje;
+  divResultado.classList.add(tipo);
+  divResultado.hidden = false;
 };
 
 const iniciarJuego = () => {
+  partida++;
   deck = crearDeck(tipos, especiales);
 
   puntosJugador = 0;
@@ -93,7 +104,6 @@ const iniciarJuego = () => {
   divCartasComputadora.innerHTML = "";
   divCartasJugador.innerHTML = "";
 
-  clearTimeout(timeoutResultado);
   divResultado.hidden = true;
   divResultado.classList.remove("alert-success", "alert-danger", "alert-secondary");
 
