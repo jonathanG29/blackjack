@@ -4,6 +4,7 @@ import {
     crearDeck,
     determinarGanador,
     jugarComputadora,
+    nombreCarta,
     pedirCarta,
     valorCarta,
 } from './';
@@ -22,6 +23,20 @@ describe('valorCarta', () => {
         expect( valorCarta('QS') ).toBe(10);
         expect( valorCarta('KC') ).toBe(10);
         expect( valorCarta('AH') ).toBe(11);
+    });
+});
+
+describe('nombreCarta', () => {
+    test('nombra las cartas numéricas con su palo', () => {
+        expect( nombreCarta('2C') ).toBe('2 de tréboles');
+        expect( nombreCarta('10H') ).toBe('10 de corazones');
+    });
+
+    test('nombra las figuras y el As', () => {
+        expect( nombreCarta('AS') ).toBe('As de picas');
+        expect( nombreCarta('JD') ).toBe('Jota de diamantes');
+        expect( nombreCarta('QH') ).toBe('Reina de corazones');
+        expect( nombreCarta('KC') ).toBe('Rey de tréboles');
     });
 });
 
