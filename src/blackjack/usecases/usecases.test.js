@@ -84,14 +84,26 @@ describe('jugarComputadora', () => {
         expect( jugarComputadora(20, deck) ).toEqual({ mano: ['5D', '9H', 'KC'], puntos: 24 });
     });
 
-    test('pide una sola carta si el jugador se pasó de 21', () => {
-        const deck = ['KC', '2H'];
-        expect( jugarComputadora(25, deck) ).toEqual({ mano: ['2H'], puntos: 2 });
+    test('continúa desde la mano inicial', () => {
+        const deck = ['KC', '9H'];
+        expect( jugarComputadora(18, deck, ['5D', '4C']) ).toEqual({ mano: ['5D', '4C', '9H'], puntos: 18 });
     });
 
-    test('pide al menos una carta aunque el jugador tenga 0 puntos', () => {
+    test('no pide cartas si la mano inicial ya iguala o supera al jugador', () => {
+        const deck = ['2C'];
+        expect( jugarComputadora(17, deck, ['KC', '8D']) ).toEqual({ mano: ['KC', '8D'], puntos: 18 });
+        expect( deck ).toEqual(['2C']);
+    });
+
+    test('no pide cartas si el jugador se pasó de 21', () => {
         const deck = ['KC', '2H'];
-        expect( jugarComputadora(0, deck).mano ).toHaveLength(1);
+        expect( jugarComputadora(25, deck, ['5D', '3S']) ).toEqual({ mano: ['5D', '3S'], puntos: 8 });
+    });
+
+    test('no modifica la mano inicial', () => {
+        const manoInicial = ['5D', '4C'];
+        jugarComputadora(18, ['KC', '9H'], manoInicial);
+        expect( manoInicial ).toEqual(['5D', '4C']);
     });
 
     test('lanza error sin puntos mínimos', () => {
