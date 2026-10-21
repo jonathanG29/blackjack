@@ -5,7 +5,8 @@ import { pedirCarta, calcularPuntos, crearCartaHTML } from './';
  * @param {Number} puntosMinimos puntos minimos que la computadora necesita para ganar
  * @param {HTMLElement} puntosHTML elemento HTML para mostrar los puntos 
  * @param {HTMLElement} divCartasComputadora elemento HTML para mostrar las cartas 
- * @param {Array<String>} deck 
+ * @param {Array<String>} deck
+ * @returns {{ mensaje: String, tipo: String }} resultado de la partida, tipo es una clase de alert de Bootstrap
  */
 export const turnoComputadora = ( puntosMinimos, puntosHTML, divCartasComputadora, deck = [] ) => {
 
@@ -31,15 +32,13 @@ export const turnoComputadora = ( puntosMinimos, puntosHTML, divCartasComputador
 
     } while(  (puntosComputadora < puntosMinimos)  && (puntosMinimos <= 21 ) );
 
-    setTimeout(() => {
-        if( puntosComputadora === puntosMinimos ) {
-            alert('Nadie gana :(');
-        } else if ( puntosMinimos > 21 ) {
-            alert('Computadora gana')
-        } else if( puntosComputadora > 21 ) {
-            alert('Jugador Gana');
-        } else {
-            alert('Computadora Gana')
-        }
-    }, 100 );
+    if( puntosComputadora === puntosMinimos ) {
+        return { mensaje: 'Nadie gana :(', tipo: 'alert-secondary' };
+    } else if ( puntosMinimos > 21 ) {
+        return { mensaje: 'Computadora gana', tipo: 'alert-danger' };
+    } else if( puntosComputadora > 21 ) {
+        return { mensaje: 'Jugador gana', tipo: 'alert-success' };
+    } else {
+        return { mensaje: 'Computadora gana', tipo: 'alert-danger' };
+    }
 }

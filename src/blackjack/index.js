@@ -25,8 +25,32 @@ const divCartasJugador = document.querySelector("#jugador-cartas");
 const divCartasComputadora = document.querySelector("#computadora-cartas");
 
 const puntosHTML = document.querySelectorAll("small");
+const divResultado = document.querySelector("#resultado");
+
+// Debe coincidir con la duración de la animación .carta en style.css
+const DURACION_ANIMACION = 500;
+let timeoutResultado;
 
 deck = crearDeck(tipos, especiales);
+
+const terminarTurnoJugador = () => {
+  btnPedir.disabled = true;
+  btnDetener.disabled = true;
+
+  const { mensaje, tipo } = turnoComputadora(
+    puntosJugador,
+    puntosHTML[1],
+    divCartasComputadora,
+    deck
+  );
+
+  // Esperamos a que termine la animación de la última carta
+  timeoutResultado = setTimeout(() => {
+    divResultado.innerText = mensaje;
+    divResultado.classList.add(tipo);
+    divResultado.hidden = false;
+  }, DURACION_ANIMACION);
+};
 
 // Eventos
 btnPedir.addEventListener("click", () => {
@@ -40,25 +64,12 @@ btnPedir.addEventListener("click", () => {
   const imgCarta = crearCartaHTML(carta);
   divCartasJugador.append(imgCarta);
 
-  if (puntosJugador > 21) {
-    console.warn("Lo siento mucho, perdiste");
-    btnPedir.disabled = true;
-    btnDetener.disabled = true;
-    turnoComputadora(puntosJugador, puntosHTML[1], divCartasComputadora, deck);
-  } else if (puntosJugador === 21) {
-    console.warn("21, genial!");
-    btnPedir.disabled = true;
-    btnDetener.disabled = true;
-    turnoComputadora(puntosJugador, puntosHTML[1], divCartasComputadora, deck);
+  if (puntosJugador >= 21) {
+    terminarTurnoJugador();
   }
 });
 
-btnDetener.addEventListener("click", () => {
-  btnPedir.disabled = true;
-  btnDetener.disabled = true;
-
-  turnoComputadora(puntosJugador, puntosHTML[1], divCartasComputadora, deck);
-});
+btnDetener.addEventListener("click", terminarTurnoJugador);
 
 btnNuevo.addEventListener("click", () => {
   console.clear();
@@ -74,6 +85,10 @@ btnNuevo.addEventListener("click", () => {
 
   divCartasComputadora.innerHTML = "";
   divCartasJugador.innerHTML = "";
+
+  clearTimeout(timeoutResultado);
+  divResultado.hidden = true;
+  divResultado.classList.remove("alert-success", "alert-danger", "alert-secondary");
 
   btnPedir.disabled = false;
   btnDetener.disabled = false;
