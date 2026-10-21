@@ -51,7 +51,8 @@ const btnDoblar = document.querySelector("#btnDoblar");
 const btnDetener = document.querySelector("#btnDetener");
 
 const saldoHTML = document.querySelector("#saldo");
-const apuestaHTML = document.querySelector("#apuesta");
+const circuloApuesta = document.querySelector("#circulo-apuesta");
+const pista = document.querySelector("#pista");
 
 const divCartasJugador = document.querySelector("#jugador-cartas");
 const divCartasComputadora = document.querySelector("#computadora-cartas");
@@ -59,12 +60,17 @@ const divCartasComputadora = document.querySelector("#computadora-cartas");
 const puntosJugadorHTML = document.querySelector("#puntos-jugador");
 const puntosComputadoraHTML = document.querySelector("#puntos-computadora");
 const divResultado = document.querySelector("#resultado");
+const resultadoTitulo = document.querySelector("#resultado-titulo");
+const resultadoDetalle = document.querySelector("#resultado-detalle");
 
 const modalNombre = document.querySelector("#modal-nombre");
 const formNombre = document.querySelector("#form-nombre");
 const inputNombre = document.querySelector("#input-nombre");
-const nombreJugadorHTML = document.querySelector("#nombre-jugador");
+// El nombre aparece en la barra superior y junto a la mano del jugador
+const nombresJugadorHTML = document.querySelectorAll(".nombre-jugador");
 
+const btnMenu = document.querySelector("#btnMenu");
+const menuOpciones = document.querySelector("#menu-opciones");
 const btnCambiarNombre = document.querySelector("#btnCambiarNombre");
 const btnReiniciarMarcador = document.querySelector("#btnReiniciarMarcador");
 const marcadorHTML = {
@@ -81,15 +87,57 @@ const DURACION_ANIMACION = 500;
 
 const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const crearResultado = (ganador, manoGanadora, fichasGanadas) => {
-  const blackjack = esBlackjack(manoGanadora) ? "¡Blackjack! " : "";
-  const fichas = fichasGanadas > 0 ? ` (+${fichasGanadas} fichas)` : ` (${fichasGanadas} fichas)`;
+const crearResultado = (ganador, fichasGanadas) => {
+  const fichas = fichasGanadas > 0 ? `+${fichasGanadas} fichas` : `−${-fichasGanadas} fichas`;
 
-  return {
-    jugador: { mensaje: `${blackjack}${nombreJugador} gana${fichas}`, tipo: "alert-success" },
-    computadora: { mensaje: `${blackjack}Computadora gana${fichas}`, tipo: "alert-danger" },
-    empate: { mensaje: "Nadie gana, recuperas tu apuesta", tipo: "alert-secondary" },
-  }[ganador];
+  if (ganador === "empate") {
+    return { titulo: "Empate", detalle: "Recuperas tu apuesta", tipo: "empate" };
+  }
+
+  if (ganador === "jugador") {
+    return esBlackjack(manoJugador)
+      ? { titulo: "¡Blackjack!", detalle: `${nombreJugador} gana ${fichas}`, tipo: "gana" }
+      : { titulo: `${nombreJugador} gana`, detalle: fichas, tipo: "gana" };
+  }
+
+  let titulo = "Gana el crupier";
+  if (puntosJugador > 21) titulo = "Te pasaste";
+  else if (esBlackjack(manoComputadora)) titulo = "Blackjack del crupier";
+
+  return { titulo, detalle: fichas, tipo: "pierde" };
+};
+
+// Etiqueta de puntos junto a cada mano: roja si se pasa de 21, dorada con blackjack
+const pintarPuntos = (elemento, mano) => {
+  const puntos = calcularPuntos(mano);
+
+  elemento.innerText = puntos;
+  elemento.hidden = mano.length === 0;
+  elemento.classList.toggle("pasado", puntos > 21);
+  elemento.classList.toggle("blackjack", esBlackjack(mano));
+};
+
+// Las fichas de la apuesta se apilan en el círculo del paño, de mayor a menor valor
+const pintarApuesta = () => {
+  if (apuesta === 0) {
+    circuloApuesta.innerHTML = '<span class="vacio">Apuesta</span>';
+    return;
+  }
+
+  const fichas = [];
+  let resto = apuesta;
+  for (const valor of [100, 50, 25, 10]) {
+    while (resto >= valor && fichas.length < 6) {
+      fichas.push(valor);
+      resto -= valor;
+    }
+  }
+
+  circuloApuesta.innerHTML = `
+    <div class="pila">
+      ${fichas.map((valor, i) => `<span class="ficha f${valor}" style="top: ${-i * 5}px">${valor}</span>`).join("")}
+    </div>
+    <span class="monto">${apuesta} fichas</span>`;
 };
 
 const pintarMarcador = () => {
@@ -100,7 +148,10 @@ const pintarMarcador = () => {
 
 const pintarFichas = () => {
   saldoHTML.innerText = saldo;
-  apuestaHTML.innerText = apuesta;
+  pintarApuesta();
+
+  // Con la mesa vacía se indica cómo empezar
+  pista.hidden = !(manoJugador.length === 0 && apuesta === 0 && !panelApuesta.hidden);
 
   // No se puede apostar más de lo que hay en el saldo
   botonesFicha.forEach((boton) => {
@@ -130,7 +181,7 @@ const darCartaJugador = () => {
 
   manoJugador.push(carta);
   puntosJugador = calcularPuntos(manoJugador);
-  puntosJugadorHTML.innerText = puntosJugador;
+  pintarPuntos(puntosJugadorHTML, manoJugador);
 
   // <img class="carta" src="assets/cartas/2C.png">
   divCartasJugador.append(crearCartaHTML(carta));
@@ -147,7 +198,7 @@ const darCartaComputadora = (oculta = false) => {
   if (oculta) {
     cartaOcultaHTML = cartaHTML;
   } else {
-    puntosComputadoraHTML.innerText = calcularPuntos(manoComputadora);
+    pintarPuntos(puntosComputadoraHTML, manoComputadora);
   }
 };
 
@@ -162,28 +213,28 @@ const terminarTurnoJugador = async () => {
   const cartaVolteada = crearCartaHTML(manoComputadora[1]);
   cartaVolteada.classList.add("volteada");
   cartaOcultaHTML.replaceWith(cartaVolteada);
-  puntosComputadoraHTML.innerText = calcularPuntos(manoComputadora);
+  pintarPuntos(puntosComputadoraHTML, manoComputadora);
   await esperar(DURACION_ANIMACION);
 
   // La computadora saca sus cartas nuevas una por una
   for (let i = manoComputadora.length; i < mano.length; i++) {
     divCartasComputadora.append(crearCartaHTML(mano[i]));
-    puntosComputadoraHTML.innerText = calcularPuntos(mano.slice(0, i + 1));
+    pintarPuntos(puntosComputadoraHTML, mano.slice(0, i + 1));
     await esperar(DURACION_ANIMACION);
   }
 
   manoComputadora = mano;
 
   const ganador = determinarGanador(manoJugador, manoComputadora);
-  const manoGanadora = ganador === "jugador" ? manoJugador : manoComputadora;
   const pago = calcularPago(ganador, apuesta, ganador === "jugador" && esBlackjack(manoJugador));
 
   saldo += pago;
   guardarSaldo();
 
-  const { mensaje, tipo } = crearResultado(ganador, manoGanadora, pago - apuesta);
-  divResultado.innerText = mensaje;
-  divResultado.classList.add(tipo);
+  const { titulo, detalle, tipo } = crearResultado(ganador, pago - apuesta);
+  resultadoTitulo.innerText = titulo;
+  resultadoDetalle.innerText = detalle;
+  divResultado.className = `cartel ${tipo}`;
   divResultado.hidden = false;
 
   marcador[ganador]++;
@@ -208,14 +259,13 @@ const iniciarJuego = async () => {
   manoJugador = [];
   manoComputadora = [];
 
-  puntosJugadorHTML.innerText = 0;
-  puntosComputadoraHTML.innerText = 0;
+  pintarPuntos(puntosJugadorHTML, manoJugador);
+  pintarPuntos(puntosComputadoraHTML, manoComputadora);
 
   divCartasComputadora.innerHTML = "";
   divCartasJugador.innerHTML = "";
 
   divResultado.hidden = true;
-  divResultado.classList.remove("alert-success", "alert-danger", "alert-secondary");
 
   btnPedir.disabled = true;
   btnDoblar.disabled = true;
@@ -266,7 +316,7 @@ inputNombre.addEventListener("input", () => {
 
 formNombre.addEventListener("submit", () => {
   nombreJugador = inputNombre.value.trim();
-  nombreJugadorHTML.innerText = nombreJugador;
+  nombresJugadorHTML.forEach((elemento) => (elemento.innerText = nombreJugador));
   guardar("blackjack-nombre", nombreJugador);
 
   // Al cambiar el nombre a mitad de partida no se reinicia el juego
@@ -317,12 +367,31 @@ btnDoblar.addEventListener("click", () => {
 
 btnDetener.addEventListener("click", terminarTurnoJugador);
 
+const cerrarMenu = () => {
+  menuOpciones.hidden = true;
+  btnMenu.setAttribute("aria-expanded", "false");
+};
+
+btnMenu.addEventListener("click", (event) => {
+  event.stopPropagation();
+  menuOpciones.hidden = !menuOpciones.hidden;
+  btnMenu.setAttribute("aria-expanded", String(!menuOpciones.hidden));
+});
+
+// El menú se cierra al hacer clic fuera o con Escape
+document.addEventListener("click", cerrarMenu);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") cerrarMenu();
+});
+
 btnCambiarNombre.addEventListener("click", () => {
+  cerrarMenu();
   inputNombre.value = nombreJugador;
   modalNombre.showModal();
 });
 
 btnReiniciarMarcador.addEventListener("click", () => {
+  cerrarMenu();
   marcador = { jugador: 0, computadora: 0, empate: 0 };
   guardar("blackjack-marcador", marcador);
   pintarMarcador();
