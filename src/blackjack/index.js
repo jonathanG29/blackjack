@@ -6,13 +6,11 @@ import {
   crearCartaHTML,
 } from "./usecases";
 
-
 let deck = [];
 const tipos = ["C", "D", "H", "S"];
 const especiales = ["A", "J", "Q", "K"];
 
-let puntosJugador = 0,
-  puntosComputadora = 0;
+let puntosJugador = 0;
 let manoJugador = [];
 
 // Referencias del HTML
@@ -23,7 +21,8 @@ const btnNuevo = document.querySelector("#btnNuevo");
 const divCartasJugador = document.querySelector("#jugador-cartas");
 const divCartasComputadora = document.querySelector("#computadora-cartas");
 
-const puntosHTML = document.querySelectorAll("small");
+const puntosJugadorHTML = document.querySelector("#puntos-jugador");
+const puntosComputadoraHTML = document.querySelector("#puntos-computadora");
 const divResultado = document.querySelector("#resultado");
 
 // Debe coincidir con la duración de la animación .carta en style.css
@@ -38,7 +37,7 @@ const terminarTurnoJugador = () => {
 
   const { mensaje, tipo } = turnoComputadora(
     puntosJugador,
-    puntosHTML[1],
+    puntosComputadoraHTML,
     divCartasComputadora,
     deck
   );
@@ -57,7 +56,7 @@ btnPedir.addEventListener("click", () => {
 
   manoJugador.push(carta);
   puntosJugador = calcularPuntos(manoJugador);
-  puntosHTML[0].innerText = puntosJugador;
+  puntosJugadorHTML.innerText = puntosJugador;
 
   // <img class="carta" src="assets/cartas/2C.png">
   const imgCarta = crearCartaHTML(carta);
@@ -74,16 +73,13 @@ btnPedir.addEventListener("click", () => {
 btnDetener.addEventListener("click", terminarTurnoJugador);
 
 btnNuevo.addEventListener("click", () => {
-  console.clear();
-  deck = [];
   deck = crearDeck(tipos, especiales);
 
   puntosJugador = 0;
-  puntosComputadora = 0;
   manoJugador = [];
 
-  puntosHTML[0].innerText = 0;
-  puntosHTML[1].innerText = 0;
+  puntosJugadorHTML.innerText = 0;
+  puntosComputadoraHTML.innerText = 0;
 
   divCartasComputadora.innerHTML = "";
   divCartasJugador.innerHTML = "";
