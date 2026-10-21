@@ -1,4 +1,6 @@
-import { pedirCarta, calcularPuntos, crearCartaHTML } from './';
+import { pedirCarta } from './pedir-carta';
+import { calcularPuntos } from './calcular-puntos';
+import { crearCartaHTML } from './crear-carta-html';
 
 /**
  * turno de la computadora
