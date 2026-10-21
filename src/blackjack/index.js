@@ -2,7 +2,7 @@ import _ from "underscore";
 import {
   crearDeck,
   pedirCarta,
-  valorCarta,
+  calcularPuntos,
   turnoComputadora,
   crearCartaHTML,
 } from "./usecases";
@@ -14,6 +14,7 @@ const especiales = ["A", "J", "Q", "K"];
 
 let puntosJugador = 0,
   puntosComputadora = 0;
+let manoJugador = [];
 
 // Referencias del HTML
 const btnPedir = document.querySelector("#btnPedir");
@@ -31,7 +32,8 @@ deck = crearDeck(tipos, especiales);
 btnPedir.addEventListener("click", () => {
   const carta = pedirCarta(deck);
 
-  puntosJugador = puntosJugador + valorCarta(carta);
+  manoJugador.push(carta);
+  puntosJugador = calcularPuntos(manoJugador);
   puntosHTML[0].innerText = puntosJugador;
 
   // <img class="carta" src="assets/cartas/2C.png">
@@ -65,6 +67,7 @@ btnNuevo.addEventListener("click", () => {
 
   puntosJugador = 0;
   puntosComputadora = 0;
+  manoJugador = [];
 
   puntosHTML[0].innerText = 0;
   puntosHTML[1].innerText = 0;

@@ -1,4 +1,4 @@
-import { pedirCarta, valorCarta, crearCartaHTML } from './';
+import { pedirCarta, calcularPuntos, crearCartaHTML } from './';
 
 /**
  * turno de la computadora
@@ -13,11 +13,13 @@ export const turnoComputadora = ( puntosMinimos, puntosHTML, divCartasComputador
     if ( !puntosHTML ) throw new Error('Argumento puntosHTML es necesario');
 
     let puntosComputadora = 0;
+    const manoComputadora = [];
 
     do {
         const carta = pedirCarta( deck );
 
-        puntosComputadora = puntosComputadora + valorCarta( carta );
+        manoComputadora.push( carta );
+        puntosComputadora = calcularPuntos( manoComputadora );
         puntosHTML.innerText = puntosComputadora;
         
         const imgCarta = crearCartaHTML( carta );
