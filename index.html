@@ -6,89 +6,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blackjack</title>
 
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Limelight&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap">
   </head>
   <body>
 
-    <header class="titulo">
-        Blackjack
-    </header>
-    
-    <main class="container">
+    <main class="mesa">
 
-        <div class="row mt-2">
-            <div id="divBotones" class="col text-center">
+        <header class="barra">
+            <div class="jugador-info">
+                <span class="nombre nombre-jugador">Jugador</span>
+                <span class="saldo" aria-label="Saldo en fichas"><span id="saldo">1000</span></span>
+            </div>
 
-                <p class="fichas mb-2">
-                    Saldo: <strong id="saldo">1000</strong> fichas ·
-                    Apuesta: <strong id="apuesta">0</strong>
+            <h1 class="titulo">Blackjack</h1>
+
+            <div class="lado-derecho">
+                <p class="marcador" aria-label="Partidas ganadas, perdidas y empatadas">
+                    <span>G <b id="ganadas">0</b></span>
+                    <span>P <b id="perdidas">0</b></span>
+                    <span>E <b id="empates">0</b></span>
                 </p>
-
-                <!-- Antes de repartir: se elige la apuesta -->
-                <div id="panel-apuesta" hidden>
-                    <div class="d-flex flex-wrap justify-content-center gap-2">
-                        <button class="btn btn-outline-light ficha" data-valor="10">+10</button>
-                        <button class="btn btn-outline-light ficha" data-valor="25">+25</button>
-                        <button class="btn btn-outline-light ficha" data-valor="50">+50</button>
-                        <button class="btn btn-outline-light ficha" data-valor="100">+100</button>
-                        <button id="btnLimpiarApuesta" class="btn btn-outline-warning">Limpiar</button>
-                        <button id="btnRepartir" class="btn btn-success" disabled>Repartir</button>
-                    </div>
-                    <button id="btnRecargar" class="btn btn-warning mt-2" hidden>Sin fichas: recargar 1000</button>
-                </div>
-
-                <!-- Durante la partida -->
-                <div id="panel-juego" hidden>
-                    <div class="d-flex flex-wrap justify-content-center gap-2">
-                        <button id="btnPedir" class="btn btn-primary" disabled>Pedir carta</button>
-                        <button id="btnDoblar" class="btn btn-primary" disabled>Doblar</button>
-                        <button id="btnDetener" class="btn btn-primary" disabled>Detener</button>
+                <div class="menu">
+                    <button id="btnMenu" class="btn-menu" aria-label="Opciones" aria-expanded="false" aria-controls="menu-opciones">
+                        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><g fill="currentColor"><circle cx="8" cy="3" r="1.6"/><circle cx="8" cy="8" r="1.6"/><circle cx="8" cy="13" r="1.6"/></g></svg>
+                    </button>
+                    <div id="menu-opciones" class="menu-opciones" hidden>
+                        <button id="btnCambiarNombre">Cambiar nombre</button>
+                        <button id="btnReiniciarMarcador">Reiniciar marcador</button>
                     </div>
                 </div>
-
-                <p id="marcador" class="marcador mt-3 mb-0">
-                    Ganadas: <strong id="ganadas">0</strong> ·
-                    Perdidas: <strong id="perdidas">0</strong> ·
-                    Empates: <strong id="empates">0</strong>
-                </p>
-                <button id="btnCambiarNombre" class="btn btn-link btn-sm text-white">Cambiar nombre</button>
-                <button id="btnReiniciarMarcador" class="btn btn-link btn-sm text-white">Reiniciar marcador</button>
-
-                <div id="resultado" class="alert fw-bold mx-auto mt-3" style="max-width: 400px;" role="status" hidden></div>
-
             </div>
-        </div>
+        </header>
 
-        <div class="row">
-            <div class="col">
+        <section class="juego">
 
-                <h1><span id="nombre-jugador">Jugador 1</span> - <small id="puntos-jugador">0</small></h1>
-                <div id="jugador-cartas">
-                    <!-- <img class="carta" src="assets/cartas/2C.png"> -->
+            <div class="mano crupier">
+                <span class="etiqueta">Crupier <span id="puntos-computadora" class="puntos" hidden>0</span></span>
+                <div id="computadora-cartas" class="cartas">
+                    <div class="hueco"></div><div class="hueco"></div>
                 </div>
-
             </div>
-        </div>
 
-        <div class="row mt-2">
-            <div class="col">
+            <div class="centro-mesa">
+                <span class="leyenda">Blackjack paga 3 a 2 · El crupier se planta en 17</span>
+                <div id="circulo-apuesta" class="circulo-apuesta" aria-label="Apuesta"></div>
 
-                <h1>Computadora - <small id="puntos-computadora">0</small></h1>
-                <div id="computadora-cartas">
-                    <!-- <img class="carta" src="assets/cartas/3C.png"> -->
+                <div id="resultado" class="cartel" role="status" hidden>
+                    <span id="resultado-titulo" class="cartel-titulo"></span>
+                    <span id="resultado-detalle" class="cartel-detalle"></span>
                 </div>
-
+                <span id="pista" class="pista" hidden>Elige tus fichas para empezar</span>
             </div>
-        </div>
+
+            <div class="mano jugador">
+                <div id="jugador-cartas" class="cartas">
+                    <div class="hueco"></div><div class="hueco"></div>
+                </div>
+                <span class="etiqueta"><span class="nombre-jugador">Jugador</span> <span id="puntos-jugador" class="puntos" hidden>0</span></span>
+            </div>
+
+        </section>
+
+        <footer class="acciones">
+
+            <!-- Antes de repartir: se elige la apuesta -->
+            <div id="panel-apuesta" class="panel" hidden>
+                <button class="ficha f10" data-valor="10" aria-label="Apostar 10 fichas">10</button>
+                <button class="ficha f25" data-valor="25" aria-label="Apostar 25 fichas">25</button>
+                <button class="ficha f50" data-valor="50" aria-label="Apostar 50 fichas">50</button>
+                <button class="ficha f100" data-valor="100" aria-label="Apostar 100 fichas">100</button>
+                <span class="separador" aria-hidden="true"></span>
+                <button id="btnLimpiarApuesta" class="boton">Limpiar</button>
+                <button id="btnRepartir" class="boton principal" disabled>Repartir</button>
+                <button id="btnRecargar" class="boton principal" hidden>Sin fichas: recargar 1000</button>
+            </div>
+
+            <!-- Durante la partida -->
+            <div id="panel-juego" class="panel" hidden>
+                <button id="btnPedir" class="boton" disabled>Pedir carta</button>
+                <button id="btnDoblar" class="boton" disabled>Doblar</button>
+                <button id="btnDetener" class="boton principal" disabled>Plantarse</button>
+            </div>
+
+        </footer>
 
     </main>
 
-    <dialog id="modal-nombre" class="modal-nombre">
+    <dialog id="modal-nombre" class="bienvenida">
         <form id="form-nombre" method="dialog">
-            <label for="input-nombre" class="form-label fw-bold">¿Cómo te llamas?</label>
-            <input id="input-nombre" class="form-control" type="text" maxlength="20" placeholder="Tu nombre" autocomplete="off" required autofocus>
-            <button class="btn btn-primary w-100 mt-3">Empezar</button>
+            <h2>Bienvenido a la mesa</h2>
+            <p>Empiezas con 1000 fichas. Acércate a 21 sin pasarte y gánale al crupier.</p>
+            <label for="input-nombre">¿Cómo te llamas?</label>
+            <input id="input-nombre" type="text" maxlength="20" placeholder="Tu nombre" autocomplete="off" required autofocus>
+            <button class="boton">Sentarse a jugar</button>
         </form>
     </dialog>
 
