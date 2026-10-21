@@ -2,7 +2,7 @@
 export { calcularPuntos } from './calcular-puntos';
 export { crearCartaHTML } from './crear-carta-html';
 export { crearDeck } from './crear-deck';
-export { determinarGanador } from './determinar-ganador';
+export { determinarGanador, esBlackjack } from './determinar-ganador';
 export { jugarComputadora } from './jugar-computadora';
 export { nombreCarta } from './nombre-carta';
 export { pedirCarta } from './pedir-carta';

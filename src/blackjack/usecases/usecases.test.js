@@ -3,6 +3,7 @@ import {
     calcularPuntos,
     crearDeck,
     determinarGanador,
+    esBlackjack,
     jugarComputadora,
     nombreCarta,
     pedirCarta,
@@ -131,21 +132,47 @@ describe('jugarComputadora', () => {
     });
 });
 
+describe('esBlackjack', () => {
+    test('es blackjack con 21 en dos cartas', () => {
+        expect( esBlackjack(['AS', 'KD']) ).toBe(true);
+    });
+
+    test('no es blackjack con 21 en más de dos cartas', () => {
+        expect( esBlackjack(['7C', '7D', '7H']) ).toBe(false);
+    });
+
+    test('no es blackjack con dos cartas que no suman 21', () => {
+        expect( esBlackjack(['AS', '9D']) ).toBe(false);
+    });
+});
+
 describe('determinarGanador', () => {
     test('si el jugador se pasa de 21, gana la computadora', () => {
-        expect( determinarGanador(22, 5) ).toBe('computadora');
+        expect( determinarGanador(['KC', 'QD', '5H'], ['5C']) ).toBe('computadora');
     });
 
     test('si la computadora se pasa de 21, gana el jugador', () => {
-        expect( determinarGanador(18, 24) ).toBe('jugador');
+        expect( determinarGanador(['KC', '8D'], ['KH', '6D', '8H']) ).toBe('jugador');
     });
 
     test('con los mismos puntos hay empate', () => {
-        expect( determinarGanador(19, 19) ).toBe('empate');
+        expect( determinarGanador(['KC', '9D'], ['QH', '9S']) ).toBe('empate');
     });
 
     test('gana quien tenga más puntos sin pasarse', () => {
-        expect( determinarGanador(17, 20) ).toBe('computadora');
-        expect( determinarGanador(20, 17) ).toBe('jugador');
+        expect( determinarGanador(['KC', '7D'], ['QH', 'QS']) ).toBe('computadora');
+        expect( determinarGanador(['QH', 'QS'], ['KC', '7D']) ).toBe('jugador');
+    });
+
+    test('el blackjack del jugador gana a un 21 de tres cartas', () => {
+        expect( determinarGanador(['AS', 'KD'], ['7C', '7D', '7H']) ).toBe('jugador');
+    });
+
+    test('el blackjack de la computadora gana a un 21 de tres cartas', () => {
+        expect( determinarGanador(['7C', '7D', '7H'], ['AS', 'KD']) ).toBe('computadora');
+    });
+
+    test('si los dos tienen blackjack hay empate', () => {
+        expect( determinarGanador(['AS', 'KD'], ['AH', 'QC']) ).toBe('empate');
     });
 });

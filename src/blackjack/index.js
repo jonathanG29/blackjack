@@ -4,6 +4,7 @@ import {
   calcularPuntos,
   jugarComputadora,
   determinarGanador,
+  esBlackjack,
   crearCartaHTML,
 } from "./usecases";
 
@@ -44,12 +45,15 @@ let partida = 0;
 
 const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const crearResultado = (ganador) =>
-  ({
-    jugador: { mensaje: `${nombreJugador} gana`, tipo: "alert-success" },
-    computadora: { mensaje: "Computadora gana", tipo: "alert-danger" },
+const crearResultado = (ganador, manoGanadora) => {
+  const blackjack = esBlackjack(manoGanadora) ? "¡Blackjack! " : "";
+
+  return {
+    jugador: { mensaje: `${blackjack}${nombreJugador} gana`, tipo: "alert-success" },
+    computadora: { mensaje: `${blackjack}Computadora gana`, tipo: "alert-danger" },
     empate: { mensaje: "Nadie gana :(", tipo: "alert-secondary" },
-  })[ganador];
+  }[ganador];
+};
 
 const darCartaJugador = () => {
   const carta = pedirCarta(deck);
@@ -82,7 +86,7 @@ const terminarTurnoJugador = async () => {
   btnDetener.disabled = true;
 
   const partidaActual = partida;
-  const { mano, puntos } = jugarComputadora(puntosJugador, deck, manoComputadora);
+  const { mano } = jugarComputadora(puntosJugador, deck, manoComputadora);
 
   // Volteamos la carta oculta
   const cartaVolteada = crearCartaHTML(manoComputadora[1]);
@@ -103,7 +107,9 @@ const terminarTurnoJugador = async () => {
   if (partidaActual !== partida) return;
   manoComputadora = mano;
 
-  const { mensaje, tipo } = crearResultado(determinarGanador(puntosJugador, puntos));
+  const ganador = determinarGanador(manoJugador, manoComputadora);
+  const manoGanadora = ganador === "jugador" ? manoJugador : manoComputadora;
+  const { mensaje, tipo } = crearResultado(ganador, manoGanadora);
   divResultado.innerText = mensaje;
   divResultado.classList.add(tipo);
   divResultado.hidden = false;
