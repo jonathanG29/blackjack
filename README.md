@@ -9,6 +9,7 @@ Si sacas 21 con las dos primeras cartas (blackjack), tu turno termina solo. El b
 
 - **Pedir carta:** saca una carta. Si llegas a 21 o te pasas, el turno termina solo.
 - **Detener:** te plantas, se voltea la carta oculta y juega la computadora.
+- **Cambiar nombre / Reiniciar marcador:** debajo de los botones está el marcador de partidas ganadas, perdidas y empatadas. El marcador y tu nombre se guardan en el navegador (`localStorage`).
 - **Nuevo juego:** reinicia la partida con un mazo nuevo.
 
 Las cartas numéricas valen su número, J, Q y K valen 10, y el As vale 11 o 1 según convenga.

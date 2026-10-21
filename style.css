@@ -45,6 +45,10 @@ html, body{
 }
 
 
+.marcador {
+  font-size: 1.1rem;
+}
+
 .modal-nombre {
   width: min(90%, 320px);
   padding: 24px;
