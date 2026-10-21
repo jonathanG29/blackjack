@@ -20,10 +20,31 @@
         <div class="row mt-2">
             <div id="divBotones" class="col text-center">
 
-                <div class="d-flex flex-wrap justify-content-center gap-2">
-                    <button id="btnNuevo" class="btn btn-danger">Nuevo Juego</button>
-                    <button id="btnPedir" class="btn btn-primary">Pedir carta</button>
-                    <button id="btnDetener" class="btn btn-primary" disabled>Detener</button>
+                <p class="fichas mb-2">
+                    Saldo: <strong id="saldo">1000</strong> fichas ·
+                    Apuesta: <strong id="apuesta">0</strong>
+                </p>
+
+                <!-- Antes de repartir: se elige la apuesta -->
+                <div id="panel-apuesta" hidden>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <button class="btn btn-outline-light ficha" data-valor="10">+10</button>
+                        <button class="btn btn-outline-light ficha" data-valor="25">+25</button>
+                        <button class="btn btn-outline-light ficha" data-valor="50">+50</button>
+                        <button class="btn btn-outline-light ficha" data-valor="100">+100</button>
+                        <button id="btnLimpiarApuesta" class="btn btn-outline-warning">Limpiar</button>
+                        <button id="btnRepartir" class="btn btn-success" disabled>Repartir</button>
+                    </div>
+                    <button id="btnRecargar" class="btn btn-warning mt-2" hidden>Sin fichas: recargar 1000</button>
+                </div>
+
+                <!-- Durante la partida -->
+                <div id="panel-juego" hidden>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <button id="btnPedir" class="btn btn-primary" disabled>Pedir carta</button>
+                        <button id="btnDoblar" class="btn btn-primary" disabled>Doblar</button>
+                        <button id="btnDetener" class="btn btn-primary" disabled>Detener</button>
+                    </div>
                 </div>
 
                 <p id="marcador" class="marcador mt-3 mb-0">

@@ -1,4 +1,5 @@
 
+export { calcularPago, puedeDoblar } from './apuestas';
 export { calcularPuntos } from './calcular-puntos';
 export { crearCartaHTML } from './crear-carta-html';
 export { crearDeck } from './crear-deck';
