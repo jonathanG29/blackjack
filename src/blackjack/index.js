@@ -13,6 +13,7 @@ const especiales = ["A", "J", "Q", "K"];
 
 let puntosJugador = 0;
 let manoJugador = [];
+let manoComputadora = [];
 let nombreJugador = "Jugador 1";
 
 // Referencias del HTML
@@ -32,6 +33,9 @@ const formNombre = document.querySelector("#form-nombre");
 const inputNombre = document.querySelector("#input-nombre");
 const nombreJugadorHTML = document.querySelector("#nombre-jugador");
 
+// Carta de la computadora boca abajo hasta que el jugador se planta
+let cartaOcultaHTML;
+
 // Debe coincidir con la duración de la animación .carta en style.css
 const DURACION_ANIMACION = 500;
 let timeoutResultado;
@@ -43,7 +47,73 @@ const crearResultado = (ganador) =>
     empate: { mensaje: "Nadie gana :(", tipo: "alert-secondary" },
   })[ganador];
 
-deck = crearDeck(tipos, especiales);
+const darCartaJugador = () => {
+  const carta = pedirCarta(deck);
+
+  manoJugador.push(carta);
+  puntosJugador = calcularPuntos(manoJugador);
+  puntosJugadorHTML.innerText = puntosJugador;
+
+  // <img class="carta" src="assets/cartas/2C.png">
+  divCartasJugador.append(crearCartaHTML(carta));
+};
+
+const terminarTurnoJugador = () => {
+  btnPedir.disabled = true;
+  btnDetener.disabled = true;
+
+  // Volteamos la carta oculta
+  cartaOcultaHTML.replaceWith(crearCartaHTML(manoComputadora[1]));
+
+  const { mano, puntos } = jugarComputadora(puntosJugador, deck, manoComputadora);
+
+  // Solo pintamos las cartas nuevas, las dos primeras ya están en la mesa
+  mano
+    .slice(manoComputadora.length)
+    .forEach((carta) => divCartasComputadora.append(crearCartaHTML(carta)));
+  manoComputadora = mano;
+  puntosComputadoraHTML.innerText = puntos;
+
+  const { mensaje, tipo } = crearResultado(determinarGanador(puntosJugador, puntos));
+
+  // Esperamos a que termine la animación de la última carta
+  timeoutResultado = setTimeout(() => {
+    divResultado.innerText = mensaje;
+    divResultado.classList.add(tipo);
+    divResultado.hidden = false;
+  }, DURACION_ANIMACION);
+};
+
+const iniciarJuego = () => {
+  deck = crearDeck(tipos, especiales);
+
+  puntosJugador = 0;
+  manoJugador = [];
+
+  divCartasComputadora.innerHTML = "";
+  divCartasJugador.innerHTML = "";
+
+  clearTimeout(timeoutResultado);
+  divResultado.hidden = true;
+  divResultado.classList.remove("alert-success", "alert-danger", "alert-secondary");
+
+  // Dos cartas para cada uno, la segunda de la computadora boca abajo
+  darCartaJugador();
+  darCartaJugador();
+
+  manoComputadora = [pedirCarta(deck), pedirCarta(deck)];
+  cartaOcultaHTML = crearCartaHTML(manoComputadora[1], true);
+  divCartasComputadora.append(crearCartaHTML(manoComputadora[0]), cartaOcultaHTML);
+  puntosComputadoraHTML.innerText = calcularPuntos([manoComputadora[0]]);
+
+  btnPedir.disabled = false;
+  btnDetener.disabled = false;
+
+  // Blackjack: con 21 en las dos primeras cartas no hace falta seguir
+  if (puntosJugador === 21) {
+    terminarTurnoJugador();
+  }
+};
 
 // Pedimos el nombre antes de empezar
 modalNombre.showModal();
@@ -61,65 +131,18 @@ inputNombre.addEventListener("input", () => {
 formNombre.addEventListener("submit", () => {
   nombreJugador = inputNombre.value.trim();
   nombreJugadorHTML.innerText = nombreJugador;
+  iniciarJuego();
 });
-
-const terminarTurnoJugador = () => {
-  btnPedir.disabled = true;
-  btnDetener.disabled = true;
-
-  const { mano, puntos } = jugarComputadora(puntosJugador, deck);
-
-  mano.forEach((carta) => divCartasComputadora.append(crearCartaHTML(carta)));
-  puntosComputadoraHTML.innerText = puntos;
-
-  const { mensaje, tipo } = crearResultado(determinarGanador(puntosJugador, puntos));
-
-  // Esperamos a que termine la animación de la última carta
-  timeoutResultado = setTimeout(() => {
-    divResultado.innerText = mensaje;
-    divResultado.classList.add(tipo);
-    divResultado.hidden = false;
-  }, DURACION_ANIMACION);
-};
 
 // Eventos
 btnPedir.addEventListener("click", () => {
-  const carta = pedirCarta(deck);
-
-  manoJugador.push(carta);
-  puntosJugador = calcularPuntos(manoJugador);
-  puntosJugadorHTML.innerText = puntosJugador;
-
-  // <img class="carta" src="assets/cartas/2C.png">
-  const imgCarta = crearCartaHTML(carta);
-  divCartasJugador.append(imgCarta);
+  darCartaJugador();
 
   if (puntosJugador >= 21) {
     terminarTurnoJugador();
-  } else {
-    // Solo se puede detener después de pedir al menos una carta
-    btnDetener.disabled = false;
   }
 });
 
 btnDetener.addEventListener("click", terminarTurnoJugador);
 
-btnNuevo.addEventListener("click", () => {
-  deck = crearDeck(tipos, especiales);
-
-  puntosJugador = 0;
-  manoJugador = [];
-
-  puntosJugadorHTML.innerText = 0;
-  puntosComputadoraHTML.innerText = 0;
-
-  divCartasComputadora.innerHTML = "";
-  divCartasJugador.innerHTML = "";
-
-  clearTimeout(timeoutResultado);
-  divResultado.hidden = true;
-  divResultado.classList.remove("alert-success", "alert-danger", "alert-secondary");
-
-  btnPedir.disabled = false;
-  btnDetener.disabled = true;
-});
+btnNuevo.addEventListener("click", iniciarJuego);
