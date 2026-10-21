@@ -3,7 +3,9 @@ import {
     calcularPuntos,
     crearDeck,
     determinarGanador,
+    esBlackjack,
     jugarComputadora,
+    nombreCarta,
     pedirCarta,
     valorCarta,
 } from './';
@@ -22,6 +24,20 @@ describe('valorCarta', () => {
         expect( valorCarta('QS') ).toBe(10);
         expect( valorCarta('KC') ).toBe(10);
         expect( valorCarta('AH') ).toBe(11);
+    });
+});
+
+describe('nombreCarta', () => {
+    test('nombra las cartas numéricas con su palo', () => {
+        expect( nombreCarta('2C') ).toBe('2 de tréboles');
+        expect( nombreCarta('10H') ).toBe('10 de corazones');
+    });
+
+    test('nombra las figuras y el As', () => {
+        expect( nombreCarta('AS') ).toBe('As de picas');
+        expect( nombreCarta('JD') ).toBe('Jota de diamantes');
+        expect( nombreCarta('QH') ).toBe('Reina de corazones');
+        expect( nombreCarta('KC') ).toBe('Rey de tréboles');
     });
 });
 
@@ -74,12 +90,7 @@ describe('pedirCarta', () => {
 describe('jugarComputadora', () => {
     // pedirCarta saca del final, así que la primera carta en salir es la última del arreglo
 
-    test('pide cartas hasta igualar o superar al jugador', () => {
-        const deck = ['KC', '9H', '5D'];
-        expect( jugarComputadora(14, deck) ).toEqual({ mano: ['5D', '9H'], puntos: 14 });
-    });
-
-    test('se pasa de 21 si no le queda otra', () => {
+    test('pide con 16 o menos aunque se pase de 21', () => {
         const deck = ['KC', '9H', '5D'];
         expect( jugarComputadora(20, deck) ).toEqual({ mano: ['5D', '9H', 'KC'], puntos: 24 });
     });
@@ -89,10 +100,20 @@ describe('jugarComputadora', () => {
         expect( jugarComputadora(18, deck, ['5D', '4C']) ).toEqual({ mano: ['5D', '4C', '9H'], puntos: 18 });
     });
 
-    test('no pide cartas si la mano inicial ya iguala o supera al jugador', () => {
+    test('se planta con 17 aunque el jugador tenga más', () => {
         const deck = ['2C'];
-        expect( jugarComputadora(17, deck, ['KC', '8D']) ).toEqual({ mano: ['KC', '8D'], puntos: 18 });
+        expect( jugarComputadora(20, deck, ['KC', '7D']) ).toEqual({ mano: ['KC', '7D'], puntos: 17 });
         expect( deck ).toEqual(['2C']);
+    });
+
+    test('se planta con 17 usando el As como 11', () => {
+        const deck = ['5C'];
+        expect( jugarComputadora(19, deck, ['AS', '6D']) ).toEqual({ mano: ['AS', '6D'], puntos: 17 });
+    });
+
+    test('pide carta con 16', () => {
+        const deck = ['5C'];
+        expect( jugarComputadora(18, deck, ['KC', '6D']) ).toEqual({ mano: ['KC', '6D', '5C'], puntos: 21 });
     });
 
     test('no pide cartas si el jugador se pasó de 21', () => {
@@ -106,26 +127,52 @@ describe('jugarComputadora', () => {
         expect( manoInicial ).toEqual(['5D', '4C']);
     });
 
-    test('lanza error sin puntos mínimos', () => {
+    test('lanza error sin los puntos del jugador', () => {
         expect( () => jugarComputadora(undefined, ['2C']) ).toThrow();
+    });
+});
+
+describe('esBlackjack', () => {
+    test('es blackjack con 21 en dos cartas', () => {
+        expect( esBlackjack(['AS', 'KD']) ).toBe(true);
+    });
+
+    test('no es blackjack con 21 en más de dos cartas', () => {
+        expect( esBlackjack(['7C', '7D', '7H']) ).toBe(false);
+    });
+
+    test('no es blackjack con dos cartas que no suman 21', () => {
+        expect( esBlackjack(['AS', '9D']) ).toBe(false);
     });
 });
 
 describe('determinarGanador', () => {
     test('si el jugador se pasa de 21, gana la computadora', () => {
-        expect( determinarGanador(22, 5) ).toBe('computadora');
+        expect( determinarGanador(['KC', 'QD', '5H'], ['5C']) ).toBe('computadora');
     });
 
     test('si la computadora se pasa de 21, gana el jugador', () => {
-        expect( determinarGanador(18, 24) ).toBe('jugador');
+        expect( determinarGanador(['KC', '8D'], ['KH', '6D', '8H']) ).toBe('jugador');
     });
 
     test('con los mismos puntos hay empate', () => {
-        expect( determinarGanador(19, 19) ).toBe('empate');
+        expect( determinarGanador(['KC', '9D'], ['QH', '9S']) ).toBe('empate');
     });
 
     test('gana quien tenga más puntos sin pasarse', () => {
-        expect( determinarGanador(17, 20) ).toBe('computadora');
-        expect( determinarGanador(20, 17) ).toBe('jugador');
+        expect( determinarGanador(['KC', '7D'], ['QH', 'QS']) ).toBe('computadora');
+        expect( determinarGanador(['QH', 'QS'], ['KC', '7D']) ).toBe('jugador');
+    });
+
+    test('el blackjack del jugador gana a un 21 de tres cartas', () => {
+        expect( determinarGanador(['AS', 'KD'], ['7C', '7D', '7H']) ).toBe('jugador');
+    });
+
+    test('el blackjack de la computadora gana a un 21 de tres cartas', () => {
+        expect( determinarGanador(['7C', '7D', '7H'], ['AS', 'KD']) ).toBe('computadora');
+    });
+
+    test('si los dos tienen blackjack hay empate', () => {
+        expect( determinarGanador(['AS', 'KD'], ['AH', 'QC']) ).toBe('empate');
     });
 });
