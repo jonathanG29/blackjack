@@ -1,4 +1,17 @@
-import _ from 'underscore';
+/**
+ * Mezcla un arreglo con el algoritmo Fisher-Yates
+ * @param {Array<String>} arreglo arreglo a mezclar, se modifica en el lugar
+ * @returns {Array<String>} el mismo arreglo mezclado
+ */
+const mezclar = ( arreglo ) => {
+
+    for( let i = arreglo.length - 1; i > 0; i-- ) {
+        const j = Math.floor( Math.random() * ( i + 1 ) );
+        [ arreglo[i], arreglo[j] ] = [ arreglo[j], arreglo[i] ];
+    }
+
+    return arreglo;
+}
 
 /**
  * Esta función crea un nuevo deck
@@ -28,10 +41,5 @@ export const crearDeck = (tiposDeCarta, tiposEspeciales) => {
             deck.push( esp + tipo);
         }
     }
-    deck = _.shuffle( deck );
-
-    return deck;
+    return mezclar( deck );
 }
-
-
-
