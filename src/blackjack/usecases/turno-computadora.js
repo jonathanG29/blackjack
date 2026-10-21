@@ -9,7 +9,7 @@ import { pedirCarta, valorCarta, crearCartaHTML } from './';
  */
 export const turnoComputadora = ( puntosMinimos, puntosHTML, divCartasComputadora, deck = [] ) => {
 
-    if ( !puntosMinimos ) throw new Error('Puntos mínimos son necesarios');
+    if ( puntosMinimos === undefined ) throw new Error('Puntos mínimos son necesarios');
     if ( !puntosHTML ) throw new Error('Argumento puntosHTML es necesario');
 
     let puntosComputadora = 0;
