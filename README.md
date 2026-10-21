@@ -25,17 +25,22 @@ npm run dev
 | `npm run dev`     | Servidor de desarrollo               |
 | `npm run build`   | Genera la versión de producción en `dist/` |
 | `npm run preview` | Sirve localmente la versión de `dist/` |
+| `npm test`        | Ejecuta los tests con Vitest         |
 
 ## Estructura
 
 ```
 src/blackjack/
-├── index.js              # Referencias al DOM y eventos de los botones
+├── index.js              # Interfaz: referencias al DOM, eventos y pintado
 └── usecases/
     ├── calcular-puntos.js    # Puntos de una mano (As = 1 u 11)
     ├── crear-carta-html.js   # <img> de una carta
     ├── crear-deck.js         # Crea y mezcla el mazo
+    ├── determinar-ganador.js # Decide quién gana
+    ├── jugar-computadora.js  # Cartas que pide la computadora
     ├── pedir-carta.js        # Saca una carta del mazo
-    ├── turno-computadora.js  # Juega la computadora y decide el resultado
-    └── valor-carta.js        # Valor de una carta individual
+    ├── valor-carta.js        # Valor de una carta individual
+    └── usecases.test.js      # Tests de la lógica del juego
 ```
+
+La lógica del juego (`usecases/`, salvo `crear-carta-html.js`) no toca el DOM, por eso se puede probar con Vitest sin navegador.
