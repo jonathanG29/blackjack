@@ -12,12 +12,20 @@ html, body{
   padding: 20px;
   font-size: 25px;
 }
+:root {
+  /* 150px en pantallas grandes, más pequeñas en móvil */
+  --ancho-carta: clamp(70px, 22vw, 150px);
+}
+
 .carta {
-  position: relative;
-  width: 150px;
-  left: 100px;
-  margin-left: -75px;
+  width: var(--ancho-carta);
+  aspect-ratio: 691 / 1056;
   animation: Carta 0.5s ease-in-out;
+}
+
+/* Cada carta se monta sobre la mitad de la anterior */
+.carta + .carta {
+  margin-left: calc(var(--ancho-carta) / -2);
 }
 
 .carta.volteada {
@@ -61,5 +69,9 @@ html, body{
 }
 
 #computadora-cartas, #jugador-cartas {
-  height: 240px;
+  display: flex;
+  min-height: calc(var(--ancho-carta) * 1056 / 691);
+  margin-bottom: 1rem;
+  /* Las cartas entran desde la derecha; sin esto aparece scroll horizontal */
+  overflow-x: clip;
 }
