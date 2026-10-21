@@ -74,12 +74,7 @@ describe('pedirCarta', () => {
 describe('jugarComputadora', () => {
     // pedirCarta saca del final, así que la primera carta en salir es la última del arreglo
 
-    test('pide cartas hasta igualar o superar al jugador', () => {
-        const deck = ['KC', '9H', '5D'];
-        expect( jugarComputadora(14, deck) ).toEqual({ mano: ['5D', '9H'], puntos: 14 });
-    });
-
-    test('se pasa de 21 si no le queda otra', () => {
+    test('pide con 16 o menos aunque se pase de 21', () => {
         const deck = ['KC', '9H', '5D'];
         expect( jugarComputadora(20, deck) ).toEqual({ mano: ['5D', '9H', 'KC'], puntos: 24 });
     });
@@ -89,10 +84,20 @@ describe('jugarComputadora', () => {
         expect( jugarComputadora(18, deck, ['5D', '4C']) ).toEqual({ mano: ['5D', '4C', '9H'], puntos: 18 });
     });
 
-    test('no pide cartas si la mano inicial ya iguala o supera al jugador', () => {
+    test('se planta con 17 aunque el jugador tenga más', () => {
         const deck = ['2C'];
-        expect( jugarComputadora(17, deck, ['KC', '8D']) ).toEqual({ mano: ['KC', '8D'], puntos: 18 });
+        expect( jugarComputadora(20, deck, ['KC', '7D']) ).toEqual({ mano: ['KC', '7D'], puntos: 17 });
         expect( deck ).toEqual(['2C']);
+    });
+
+    test('se planta con 17 usando el As como 11', () => {
+        const deck = ['5C'];
+        expect( jugarComputadora(19, deck, ['AS', '6D']) ).toEqual({ mano: ['AS', '6D'], puntos: 17 });
+    });
+
+    test('pide carta con 16', () => {
+        const deck = ['5C'];
+        expect( jugarComputadora(18, deck, ['KC', '6D']) ).toEqual({ mano: ['KC', '6D', '5C'], puntos: 21 });
     });
 
     test('no pide cartas si el jugador se pasó de 21', () => {
@@ -106,7 +111,7 @@ describe('jugarComputadora', () => {
         expect( manoInicial ).toEqual(['5D', '4C']);
     });
 
-    test('lanza error sin puntos mínimos', () => {
+    test('lanza error sin los puntos del jugador', () => {
         expect( () => jugarComputadora(undefined, ['2C']) ).toThrow();
     });
 });
