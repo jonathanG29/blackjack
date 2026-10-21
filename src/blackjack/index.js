@@ -62,6 +62,21 @@ const darCartaJugador = () => {
   divCartasJugador.append(crearCartaHTML(carta));
 };
 
+const darCartaComputadora = (oculta = false) => {
+  const carta = pedirCarta(deck);
+  manoComputadora.push(carta);
+
+  const cartaHTML = crearCartaHTML(carta, oculta);
+  divCartasComputadora.append(cartaHTML);
+
+  // Mientras la carta esté oculta, los puntos solo cuentan las cartas visibles
+  if (oculta) {
+    cartaOcultaHTML = cartaHTML;
+  } else {
+    puntosComputadoraHTML.innerText = calcularPuntos(manoComputadora);
+  }
+};
+
 const terminarTurnoJugador = async () => {
   btnPedir.disabled = true;
   btnDetener.disabled = true;
@@ -94,12 +109,17 @@ const terminarTurnoJugador = async () => {
   divResultado.hidden = false;
 };
 
-const iniciarJuego = () => {
+const iniciarJuego = async () => {
   partida++;
+  const partidaActual = partida;
   deck = crearDeck(tipos, especiales);
 
   puntosJugador = 0;
   manoJugador = [];
+  manoComputadora = [];
+
+  puntosJugadorHTML.innerText = 0;
+  puntosComputadoraHTML.innerText = 0;
 
   divCartasComputadora.innerHTML = "";
   divCartasJugador.innerHTML = "";
@@ -107,14 +127,25 @@ const iniciarJuego = () => {
   divResultado.hidden = true;
   divResultado.classList.remove("alert-success", "alert-danger", "alert-secondary");
 
-  // Dos cartas para cada uno, la segunda de la computadora boca abajo
-  darCartaJugador();
-  darCartaJugador();
+  btnPedir.disabled = true;
+  btnDetener.disabled = true;
 
-  manoComputadora = [pedirCarta(deck), pedirCarta(deck)];
-  cartaOcultaHTML = crearCartaHTML(manoComputadora[1], true);
-  divCartasComputadora.append(crearCartaHTML(manoComputadora[0]), cartaOcultaHTML);
-  puntosComputadoraHTML.innerText = calcularPuntos([manoComputadora[0]]);
+  // Se reparte como en el casino, alternando y con la última carta de la computadora boca abajo
+  const repartos = [
+    () => darCartaJugador(),
+    () => darCartaComputadora(),
+    () => darCartaJugador(),
+    () => darCartaComputadora(true),
+  ];
+
+  for (const repartir of repartos) {
+    if (partidaActual !== partida) return;
+
+    repartir();
+    await esperar(DURACION_ANIMACION);
+  }
+
+  if (partidaActual !== partida) return;
 
   btnPedir.disabled = false;
   btnDetener.disabled = false;
